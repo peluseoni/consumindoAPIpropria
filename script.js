@@ -48,7 +48,8 @@ const removerAluno = async (evento) => {
 };
 
 const renderAlunos = async () => {
-    const alunos = await buscarAlunos();
+   // const alunos = await buscarAlunos();
+    const alunos = [{nome:"João",idade: "23"},{nome:"João",idade: "23"},{nome:"João",idade: "23"}]
     const elemUl = document.querySelector('#lista-alunos');
 
     for (let aluno of alunos) {
@@ -134,6 +135,8 @@ const trocarCores = (evento) => {
         document.head.querySelector('#css').setAttribute('href', 'light.css');
     } else if (estado === 'escuro') {
         document.head.querySelector('#css').setAttribute('href', 'dark.css');
+    } else if (estado === 'cyberpunk') {
+        document.head.querySelector('#css').setAttribute('href', 'joao.css');
     }
 }
 
