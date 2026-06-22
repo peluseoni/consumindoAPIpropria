@@ -22,6 +22,10 @@
     100% { box-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
 }
 
+* {
+    font-family: 'Press Start 2P', cursive !important;
+}
+
 body {
     background-color: #00ffff;
     background-image: 
@@ -33,6 +37,8 @@ body {
     padding: 20px;
     margin: 0;
     overflow-x: hidden;
+    line-height: 1.5;
+    -webkit-font-smoothing: none;
 }
 
 body::before {
@@ -48,9 +54,7 @@ body::before {
     background-repeat: no-repeat;
     z-index: 100;
     filter: drop-shadow(5px 5px 0px #ff00ff);
-    
-}
-
+}    
 
 body::after {
     content: "★";
@@ -62,9 +66,12 @@ body::after {
     animation: star-float 3s linear infinite;
     z-index: -1;
     text-shadow: 0 0 15px #00ffff;
+    line-height: 1.5;
+    -webkit-font-smoothing: none;
 }
 
 h1 {
+    font-family: 'Press Start 2P', cursive; 
     font-size: 2rem;
     text-align: center;
     background: #000;
@@ -98,25 +105,6 @@ section::before {
     font-size: 10px;
 }
 
-button, input[type="button"] {
-    background: #00ffff;
-    color: #000;
-    border: none;
-    padding: 15px 25px;
-    font-family: 'Press Start 2P', cursive;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 5px 5px 0px #ff00ff;
-    transition: 0.1s;
-}
-
-button:hover {
-    background: #ff00ff;
-    color: #fff;
-    box-shadow: 2px 2px 0px #00ffff;
-    transform: translate(3px, 3px);
-}
-
 input[type="text"], input[type="number"] {
     background: #111;
     border: 2px solid #ff00ff;
@@ -125,6 +113,10 @@ input[type="text"], input[type="number"] {
     width: 100%;
     box-sizing: border-box;
     margin: 10px 0;
+}
+
+input, button, select, textarea, label, span, p, div, li, h1, h2, h3 {
+    font-family: 'Press Start 2P', cursive !important;
 }
 
 ul {
