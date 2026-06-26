@@ -13,40 +13,48 @@ const buscarAlunos = async () => {
     }
 };
 
+const validarEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
 const enviarAluno = async () => {
     const nome = document.querySelector("#input-nome").value.trim();
-    const idade = document.querySelector("#input-idade").value.trim();
+    const nascimento = document.querySelector('#input-nascimento').value.trim();
     const email = document.querySelector("#input-email").value.trim();
     const telefone = document.querySelector("#input-telefone").value.trim();
     const feedback = document.querySelector('#feedback');
 
-    if (!nome || !email || !idade || !email) {
-        feedback.textContent = "⚠️ ALERTA: Nome, Idade, Telefone e Email são obrigatórios para o registro!";
+    if (!nome || !nascimento || !telefone || !email) {
+        feedback.textContent = "⚠️ ALERTA: Nome, Data de Nascimento, Telefone e Email são obrigatórios para o registro!";
         style.color = "var(--detalhe-alerta)";
-    }
-
-    try {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user: { nome, idade, email } })
+    } else if (!validarEmail(email)) {
+        feedback.textContent = "⚠️ ALERTA: Email inválido! Exemplo correto.: seuemail@email.com";
+        style.color = "var(--detalhe-alerta)";
+    } else {
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: { nome, nascimento, telefone, email } })
+            }
+            let resposta = await fetch('http://localhost:3000/users', options);
+            resposta = await resposta.json();
+            feedback.textContent = resposta;
+    
+            document.querySelector("#input-nome").value = '';
+            document.querySelector("#input-nascimento").value = '';
+            document.querySelector("#input-email").value = '';
+            document.querySelector("#input-telefone").value = '';
+            
+    
+            limparAlunos();
+            await renderAlunos();
+        } catch (e) {
+            console.error(e);
         }
-        let resposta = await fetch('http://localhost:3000/users', options);
-        resposta = await resposta.json();
-        feedback.textContent = resposta;
-
-        document.querySelector("#input-nome").value = '';
-        document.querySelector("#input-idade").value = '';
-        document.querySelector("#input-email").value = '';
-        document.querySelector("#input-telefone").value = '';
-        
-
-        limparAlunos();
-        await renderAlunos();
-    } catch (e) {
-        console.error(e);
     }
 }
 
@@ -66,6 +74,19 @@ const removerAluno = async (evento) => {
     }
 };
 
+const calcularIdade = (dataNascimento) => {
+    const data = new Date(dataNascimento);
+    const hoje = new Date(Date.now());
+
+    let idade = hoje.getFullYear() - data.getFullYear();
+
+    if (hoje.getMonth() < data.getMonth() || (hoje.getMonth() === data.getMonth() && hoje.getDate() < data.getDate())) {
+        idade -= 1;
+    }
+
+    return idade;
+}
+
 const renderAlunos = async () => {
     const alunos = await buscarAlunos();
 
@@ -74,7 +95,8 @@ const renderAlunos = async () => {
     for (let aluno of alunos) {
         const elemLi = document.createElement('li');
 
-        elemLi.innerHTML = `Nome: ${aluno.nome} - Idade: ${aluno.idade} -Tel: ${aluno.telefone} - Email: ${aluno.email}`;
+        // const idade = aluno.nascimento
+        elemLi.innerHTML = `Nome: ${aluno.nome} - Data de Nascimento: ${aluno.nascimento} - Idade: ${calcularIdade(aluno.nascimento)} -Tel: ${aluno.telefone} - Email: ${aluno.email}`;
         const btRemover = document.createElement('input');
         btRemover.type = 'button';
         btRemover.classList.add('botoes-remover');
@@ -101,10 +123,9 @@ const editarAluno = async (evento) => {
     inputNome.placeholder = 'Nome';
     inputNome.id = 'input-editar-nome';
 
-    const inputIdade = document.createElement('input');
-    inputIdade.type = 'number';
-    inputIdade.placeholder = 'Idade';
-    inputIdade.id = 'input-editar-idade';
+    const inputNascimento = document.createElement('input');
+    inputNascimento.type = 'date';
+    inputNascimento.id = 'input-editar-nascimento';
 
     const inputTelefone = document.createElement('input');
     inputTelefone.type = 'tel';
@@ -122,21 +143,21 @@ const editarAluno = async (evento) => {
     btAtualizar.onclick = atualizarAluno;
 
     evento.target.parentNode.appendChild(inputNome);
-    evento.target.parentNode.appendChild(inputIdade);
+    evento.target.parentNode.appendChild(inputNascimento);
     evento.target.parentNode.appendChild(inputTelefone);
     evento.target.parentNode.appendChild(inputEmail);
     evento.target.parentNode.appendChild(btAtualizar);
 }
 
 const atualizarAluno = async (evento) => {
-    const nome = document.querySelector('#input-editar-nome').value;
-    const idade = document.querySelector('#input-editar-idade').value;
-    const telefone = document.querySelector('#input-editar-telefone').value;
-    const email = document.querySelector('#input-editar-email').value;
+    const nome = document.querySelector('#input-editar-nome').value.trim();
+    const nascimento = document.querySelector('#input-editar-nascimento').value.trim();
+    const telefone = document.querySelector('#input-editar-telefone').value.trim();
+    const email = document.querySelector('#input-editar-email').value.trim();
     const feedback = document.querySelector('#feedback');
 
-    if (!nome || !email || !idade || !email) {
-        feedback.textContent = "⚠️ ALERTA: Nome, Idade, Telefone e Email são obrigatórios para o registro!";
+    if (!nome || !nascimento || !telefone || !email) {
+        feedback.textContent = "⚠️ ALERTA: Nome, Data de Nascimento, Telefone e Email são obrigatórios para o registro!";
         style.color = "var(--detalhe-alerta)";
     } else {
         try {
@@ -145,7 +166,7 @@ const atualizarAluno = async (evento) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user: { nome, idade, telefone, email} })
+                body: JSON.stringify({ user: { nome, nascimento, telefone, email} })
             }
             let resposta = await fetch(`http://localhost:3000/users/${evento.target.dataset.id}`, options);
             resposta = await resposta.json();
