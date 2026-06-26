@@ -13,6 +13,11 @@ const buscarAlunos = async () => {
     }
 };
 
+const validarEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
 const enviarAluno = async () => {
     const nome = document.querySelector("#input-nome").value.trim();
     const nascimento = document.querySelector('#input-nascimento').value.trim();
@@ -23,30 +28,33 @@ const enviarAluno = async () => {
     if (!nome || !nascimento || !telefone || !email) {
         feedback.textContent = "⚠️ ALERTA: Nome, Data de Nascimento, Telefone e Email são obrigatórios para o registro!";
         style.color = "var(--detalhe-alerta)";
-    }
-
-    try {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user: { nome, nascimento, telefone, email } })
+    } else if (!validarEmail(email)) {
+        feedback.textContent = "⚠️ ALERTA: Email inválido! Exemplo correto.: seuemail@email.com";
+        style.color = "var(--detalhe-alerta)";
+    } else {
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user: { nome, nascimento, telefone, email } })
+            }
+            let resposta = await fetch('http://localhost:3000/users', options);
+            resposta = await resposta.json();
+            feedback.textContent = resposta;
+    
+            document.querySelector("#input-nome").value = '';
+            document.querySelector("#input-nascimento").value = '';
+            document.querySelector("#input-email").value = '';
+            document.querySelector("#input-telefone").value = '';
+            
+    
+            limparAlunos();
+            await renderAlunos();
+        } catch (e) {
+            console.error(e);
         }
-        let resposta = await fetch('http://localhost:3000/users', options);
-        resposta = await resposta.json();
-        feedback.textContent = resposta;
-
-        document.querySelector("#input-nome").value = '';
-        document.querySelector("#input-nascimento").value = '';
-        document.querySelector("#input-email").value = '';
-        document.querySelector("#input-telefone").value = '';
-        
-
-        limparAlunos();
-        await renderAlunos();
-    } catch (e) {
-        console.error(e);
     }
 }
 
